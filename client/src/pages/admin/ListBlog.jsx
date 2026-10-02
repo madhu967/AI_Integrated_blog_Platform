@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 const ListBlog = () => {
   const [blogs, setBlogs] = useState([]);
+  const [filter, setFilter] = useState('All');
   const {axios} = useAppContext()
 
   const fetchBlogs = async () => {
@@ -26,11 +27,22 @@ const ListBlog = () => {
      fetchBlogs()
   }, [])
 
+  const filteredBlogs = blogs.filter(blog => {
+      if (filter === 'All') return true;
+      const blogStatus = blog.status || 'Approved'; // fallback for old blogs
+      return blogStatus === filter;
+  });
+
   return (
     <div className='flex-1 lg:px-10 lg:py-6'>
-      <div className='flex justify-between items-end mb-8 border-b border-gray-900 pb-4'>
+      <div className='flex flex-col sm:flex-row justify-between sm:items-end mb-8 border-b border-gray-900 pb-4 gap-4'>
           <h2 className="text-3xl text-gray-900" style={{ fontFamily: "'Prata', serif" }}>Manage Essays</h2>
-          <span className='text-xs uppercase tracking-widest text-gray-500 font-bold'>{blogs.length} Total</span>
+          <div className='flex gap-4'>
+             <button onClick={() => setFilter('All')} className={`uppercase tracking-widest text-[10px] font-bold px-4 py-2 border transition-colors cursor-pointer ${filter === 'All' ? 'bg-gray-900 text-white border-gray-900' : 'bg-transparent text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}`}>All</button>
+             <button onClick={() => setFilter('Pending')} className={`uppercase tracking-widest text-[10px] font-bold px-4 py-2 border transition-colors cursor-pointer ${filter === 'Pending' ? 'bg-gray-900 text-white border-gray-900' : 'bg-transparent text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}`}>Pending</button>
+             <button onClick={() => setFilter('Approved')} className={`uppercase tracking-widest text-[10px] font-bold px-4 py-2 border transition-colors cursor-pointer ${filter === 'Approved' ? 'bg-gray-900 text-white border-gray-900' : 'bg-transparent text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}`}>Approved</button>
+             <button onClick={() => setFilter('Rejected')} className={`uppercase tracking-widest text-[10px] font-bold px-4 py-2 border transition-colors cursor-pointer ${filter === 'Rejected' ? 'bg-gray-900 text-white border-gray-900' : 'bg-transparent text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}`}>Rejected</button>
+          </div>
       </div>
 
        <div className='overflow-x-auto bg-white border border-gray-200'>
@@ -40,12 +52,13 @@ const ListBlog = () => {
                             <th scope='col' className='px-6 py-4 font-semibold'>#</th>
                             <th scope='col' className='px-6 py-4 font-semibold'>Title</th>
                             <th scope='col' className='px-6 py-4 max-sm:hidden font-semibold'>Date</th>
-                            <th scope='col' className='px-6 py-4 max-sm:hidden font-semibold'>Status</th>
+                            <th scope='col' className='px-6 py-4 font-semibold'>Review Status</th>
+                            <th scope='col' className='px-6 py-4 max-sm:hidden font-semibold'>Publish Status</th>
                             <th scope='col' className='px-6 py-4 font-semibold text-right'>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {blogs.map((blog, index) => {
+                        {filteredBlogs.map((blog, index) => {
                            return <BlogTableItem key={blog._id} blog={blog} fetchBlogs={fetchBlogs} index={index+1} />
                         })}
                     </tbody>

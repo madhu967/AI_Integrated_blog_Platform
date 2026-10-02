@@ -33,14 +33,48 @@ export const addBlog = async (req, res) => {
     const image = optimizedImageUrl;
 
     const authorId = req.user ? req.user.id : null;
-    await Blog.create({ title, subTitle, description, category, image, isPublished, author: authorId });
+    const isUser = req.user && req.user.role === 'user';
+    
+    // Enforce review workflow: Users must submit for review, admins can bypass
+    const finalStatus = isUser ? 'Pending' : 'Approved';
+    const finalIsPublished = isUser ? false : isPublished;
 
-   
+    await Blog.create({ 
+        title, subTitle, description, category, image, 
+        isPublished: finalIsPublished, 
+        author: authorId,
+        status: finalStatus
+    });
 
-    res.json({ success: true, message: "Blog added successfully" });
+    res.json({ success: true, message: isUser ? "Blog submitted for admin review" : "Blog added successfully" });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
+};
+
+export const updateBlogStatus = async (req, res) => {
+    try {
+        const { id, status } = req.body;
+        
+        if (req.user && req.user.role === 'user') {
+            return res.json({ success: false, message: "Unauthorized. Only admins can update status." });
+        }
+
+        const blog = await Blog.findById(id);
+        if (!blog) return res.json({ success: false, message: "Blog not found" });
+
+        blog.status = status;
+        if (status === 'Approved') {
+            blog.isPublished = true;
+        } else if (status === 'Rejected') {
+            blog.isPublished = false;
+        }
+        await blog.save();
+
+        res.json({ success: true, message: `Blog ${status.toLowerCase()} successfully` });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
 };
 
 export const getAllBlogs = async (req, res) => {
@@ -89,6 +123,11 @@ export const togglePublish = async (req, res) => {
 
     if (req.user && req.user.role === 'user' && blog.author?.toString() !== req.user.id) {
         return res.json({ success: false, message: "Unauthorized to modify this blog" });
+    }
+
+    // Only allow publishing if it is Approved
+    if (blog.status !== 'Approved' && !blog.isPublished) {
+        return res.json({ success: false, message: `Cannot publish a ${blog.status.toLowerCase()} blog. Admin approval required.` });
     }
 
     blog.isPublished = !blog.isPublished;
