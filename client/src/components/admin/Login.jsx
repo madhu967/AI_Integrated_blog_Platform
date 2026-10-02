@@ -62,13 +62,14 @@ const Login = () => {
                  </div>
                  
                  <div className='flex gap-4 mb-10 w-full justify-center border-b border-gray-200 pb-2'>
-                    {['User Login', 'User Register', 'Admin Login'].map(tab => (
+                    {['User Login', 'Admin Login'].map(tab => (
                         <button 
                             key={tab}
+                            type="button"
                             onClick={() => setMode(tab)}
-                            className={`uppercase tracking-widest text-[9px] font-bold pb-2 border-b-2 transition-colors duration-300 ${mode === tab ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-900'}`}
+                            className={`uppercase tracking-widest text-[9px] font-bold pb-2 border-b-2 transition-colors duration-300 ${(mode === tab || (mode === 'User Register' && tab === 'User Login')) ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-900'}`}
                         >
-                            {tab}
+                            {tab === 'User Login' ? 'User' : 'Admin'}
                         </button>
                     ))}
                  </div>
@@ -114,10 +115,26 @@ const Login = () => {
                     
                     <button 
                         type='submit' 
-                        className='w-full py-4 uppercase tracking-widest text-xs font-bold bg-gray-900 text-white cursor-pointer hover:bg-primary transition-colors duration-300'
+                        className='w-full py-4 uppercase tracking-widest text-xs font-bold bg-gray-900 text-white cursor-pointer hover:bg-primary transition-colors duration-300 mb-6'
                     >
                         {mode === 'User Register' ? 'Create Account' : 'Sign In'}
                     </button>
+
+                    {(mode === 'User Login' || mode === 'User Register') && (
+                        <div className='text-center'>
+                            {mode === 'User Login' ? (
+                                <p className='text-xs text-gray-500 font-light'>
+                                    Don't have an account?{' '}
+                                    <span onClick={() => setMode('User Register')} className='font-bold text-gray-900 cursor-pointer hover:underline'>Sign up</span>
+                                </p>
+                            ) : (
+                                <p className='text-xs text-gray-500 font-light'>
+                                    Already have an account?{' '}
+                                    <span onClick={() => setMode('User Login')} className='font-bold text-gray-900 cursor-pointer hover:underline'>Login</span>
+                                </p>
+                            )}
+                        </div>
+                    )}
                  </form>
             </div>
         </div>
