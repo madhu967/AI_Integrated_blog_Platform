@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 
@@ -9,6 +9,20 @@ const Login = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    useEffect(() => {
+        if (mode === 'Admin Login') {
+            setEmail('admin@example.com');
+            setPassword('madhu123');
+        } else if (mode === 'User Login') {
+            setEmail('user@example.com');
+            setPassword('user123');
+        } else {
+            setEmail('');
+            setPassword('');
+            setName('');
+        }
+    }, [mode]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,20 +68,29 @@ const Login = () => {
     <div className='flex flex-col items-center justify-center min-h-screen bg-gray-50'>
         <div className='w-full max-w-md p-10 bg-white border border-gray-200'>
             <div className='flex flex-col items-center justify-center text-center'>
-                 <div className='w-full mb-10'>
+                 <div className='w-full mb-8'>
                     <span className='text-3xl font-bold tracking-tighter text-gray-900 inline-block mb-4' style={{ fontFamily: "'Prata', serif" }}>
                         OAK<span className='text-primary'>&</span>IRON
                     </span>
                     <h1 className='text-xs uppercase tracking-widest font-semibold text-gray-400 mb-2'>Portal Access</h1>
+                    
+                    <p className='text-[10px] uppercase tracking-widest font-bold text-primary bg-primary/5 py-2 mt-4'>
+                        Demo {mode === 'User Login' ? 'User' : mode === 'Admin Login' ? 'Admin' : 'Account'}: 
+                        <span className='text-gray-900 ml-2'>
+                            {mode === 'User Login' ? 'user@example.com / user123' : 
+                             mode === 'Admin Login' ? 'admin@example.com / madhu123' : 
+                             'Fill form to register'}
+                        </span>
+                    </p>
                  </div>
                  
-                 <div className='flex gap-4 mb-10 w-full justify-center border-b border-gray-200 pb-2'>
+                 <div className='flex gap-6 mb-10 w-full justify-center border-b border-gray-200 pb-2'>
                     {['User Login', 'Admin Login'].map(tab => (
                         <button 
                             key={tab}
                             type="button"
                             onClick={() => setMode(tab)}
-                            className={`uppercase tracking-widest text-[9px] font-bold pb-2 border-b-2 transition-colors duration-300 ${(mode === tab || (mode === 'User Register' && tab === 'User Login')) ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-900'}`}
+                            className={`uppercase tracking-widest text-sm font-bold pb-2 border-b-2 transition-colors duration-300 ${(mode === tab || (mode === 'User Register' && tab === 'User Login')) ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-900'}`}
                         >
                             {tab === 'User Login' ? 'User' : 'Admin'}
                         </button>

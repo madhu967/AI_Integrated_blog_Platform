@@ -29,7 +29,13 @@ export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        const user = await userModel.findOne({ email });
+        let user = await userModel.findOne({ email });
+
+        // Auto-create demo user on the fly for easy testing
+        if (!user && email === 'user@example.com') {
+            user = new userModel({ name: 'Demo User', email: 'user@example.com', password: 'user123' });
+            await user.save();
+        }
 
         if (!user) {
             return res.json({ success: false, message: 'User does not exist' });
