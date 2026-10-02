@@ -69,7 +69,7 @@ const Header = () => {
           </div>
 
           {/* Right Column - Premium Imagery */}
-          <div className="hidden lg:block relative h-[600px] w-full group overflow-hidden">
+          <div className="relative h-[280px] sm:h-[400px] lg:h-[600px] w-full group overflow-hidden">
             <div className="absolute inset-0 bg-gray-100 transform -skew-x-3 translate-x-4"></div>
             <img 
               src={blog_pic_1} 
