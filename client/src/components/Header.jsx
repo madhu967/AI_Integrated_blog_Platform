@@ -1,43 +1,87 @@
-import React from 'react'
-import { assets } from '../assets/assets'
+import React, { useRef } from 'react'
 import { useAppContext } from '../context/AppContext'
-import { useRef } from 'react'
+import blog_pic_1 from '../assets/blog_pic_1.png'
 
 const Header = () => {
+  const { setInput, input } = useAppContext()
+  const inputRef = useRef()
 
-  const {setInput,input}=useAppContext()
-  const inputRef =useRef()
-
-  const onSubmitHandler =async(e)=>{
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     setInput(inputRef.current.value)
   }
 
-  const onClear =()=>{
+  const onClear = () => {
     setInput('')
-    inputRef.current.value=''
+    inputRef.current.value = ''
   }
+
   return (
-    <div className='mx-8 sm:mx-16 xl:mx-24 relative'>
-        <div className='text-center mt-20 mb-8'>
-           <div className='inline-flex items-center justify-center gap-4 px-6 py-1.5 mb-4 border border-primary/40 bg-primary/10 rounded-full text-sm text-primary'>
-            <p>New: AI feature integrated</p>
-            <img src={assets.star_icon} className='w-2.5' alt="" />
-           </div>
-           <h1 className='text-3xl sm:text-5xl font-semibold sm:leading-16 text-gray-700'>Your own <span className='text-primary'> blogging</span> <br /> platform</h1>
-           <p className='my-6 sm:my-8 max-w-2xl m-auto max-sm:text-xs text-gray-500'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia illo dignissimos placeat odit fugiat voluptates consequuntur sequi dolorum error ad quam, 
-</p>
-        
-        <form onSubmit={onSubmitHandler} className='flex justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 bg-white rounded overflow-hidden'>
-            <input ref={inputRef} className='w-full pl-4 outline-none' type="text" placeholder='Search for blogs' required />
-            <button className='bg-primary text-white px-8 py-2 m-1.5 rounded hover:scale-105 transition-all cursor-pointer' type='submit'>Search</button>
-        </form>
+    <header className="relative bg-white w-full border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pt-24 pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left Column - Content */}
+          <div className="flex flex-col justify-center">
+            <div className="mb-6 inline-flex">
+              <span className="uppercase tracking-widest text-xs font-bold text-primary border-b-2 border-primary pb-1">
+                A New Standard in Writing
+              </span>
+            </div>
+            
+            <h1 className="text-5xl sm:text-7xl font-light text-gray-900 leading-tight mb-8" style={{ fontFamily: "'Prata', serif" }}>
+              Elevate your <br />
+              <span className="font-bold text-primary italic">narrative.</span>
+            </h1>
+            
+            <p className="text-lg text-gray-500 max-w-lg mb-10 leading-relaxed font-light">
+              Experience a sophisticated space where your ideas take center stage. 
+              Write, curate, and share profound stories with absolute elegance.
+            </p>
+            
+            <form onSubmit={onSubmitHandler} className="flex flex-col sm:flex-row gap-4 max-w-md">
+              <div className="relative flex-grow">
+                <input 
+                  ref={inputRef} 
+                  className="w-full pb-3 text-lg bg-transparent border-b border-gray-300 outline-none focus:border-primary transition-colors text-gray-800 placeholder-gray-400" 
+                  type="text" 
+                  placeholder="Discover essays & insights..." 
+                  required 
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="bg-gray-900 hover:bg-primary text-white px-8 py-3 uppercase tracking-widest text-xs font-bold transition-colors duration-300"
+              >
+                Explore
+              </button>
+            </form>
+            
+            {input && (
+              <div className="mt-4">
+                <button 
+                  onClick={onClear} 
+                  className="text-xs text-gray-400 hover:text-gray-800 uppercase tracking-widest underline transition-colors"
+                >
+                  Clear search
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Premium Imagery */}
+          <div className="hidden lg:block relative h-[600px] w-full group overflow-hidden">
+            <div className="absolute inset-0 bg-gray-100 transform -skew-x-3 translate-x-4"></div>
+            <img 
+              src={blog_pic_1} 
+              alt="Elegant writing desk" 
+              className="absolute inset-0 w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+            />
+          </div>
+
         </div>
-        <div className='text-center'>
-          {input &&<button  onClick={onClear} className='border font-light text-xs py-1 px-3 rounded-sm shadow-custom-sm cursor-pointer'>Clear Search</button>}
-        </div> 
-        <img src={assets.gradientBackground} className='absolute -top-50 -z-1 opacity-50 ' alt="" />
-    </div>
+      </div>
+    </header>
   )
 }
 

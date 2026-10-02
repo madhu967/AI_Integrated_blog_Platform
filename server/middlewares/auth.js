@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
 
-const auth =(req,res,next)=>{
-    const token =req.headers.authorization;
+const auth = (req, res, next) => {
+    const token = req.headers.authorization;
 
     try {
-        jwt.verify(token,process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
     } catch (error) {
-        res.json({success:false,message:"Inavalid token"})
+        res.json({ success: false, message: "Invalid token" });
     }
 }
 
-export default auth
+export default auth;

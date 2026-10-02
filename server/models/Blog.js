@@ -6,7 +6,8 @@ const blogSchema =new mongoose.Schema({
     description:{type:String,required:true},
     category:{type:String,required:true},
     image:{type:String,required:true},
-    isPublished:{type:Boolean,required:true}
+    isPublished:{type:Boolean,required:true},
+    author:{type:mongoose.Schema.Types.ObjectId, ref: 'user'}
 },{timestamps:true})
 
 const Blog =mongoose.model('blog',blogSchema);

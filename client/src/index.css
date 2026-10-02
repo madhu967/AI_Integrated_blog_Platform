@@ -10,11 +10,12 @@
 }
 
 @theme{
-  --color-primary:#5044E5
+  --color-primary:#D92525
 }
 
-.rich-text { font-size: 15px;  }
+.rich-text { font-size: 18px; font-family: 'Prata', serif !important; }
 
+.rich-text * { font-family: 'Prata', serif !important; }
 .rich-text p { margin-bottom: 16px; color: #292929; }
 
 .rich-text h1 { font-size: 36px; font-weight: 700; color: #252525 !important; margin: 32px 0; }

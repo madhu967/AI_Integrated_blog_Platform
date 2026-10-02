@@ -32,7 +32,8 @@ export const addBlog = async (req, res) => {
 
     const image = optimizedImageUrl;
 
-    await Blog.create({ title, subTitle, description, category, image, isPublished });
+    const authorId = req.user ? req.user.id : null;
+    await Blog.create({ title, subTitle, description, category, image, isPublished, author: authorId });
 
    
 
@@ -65,6 +66,13 @@ export const getBlogById = async (req, res) => {
 export const deleteBlogById = async (req, res) => {
   try {
     const { id } = req.body;
+    const blog = await Blog.findById(id);
+    if (!blog) return res.json({ succes: false, message: "Blog not found" });
+
+    if (req.user && req.user.role === 'user' && blog.author?.toString() !== req.user.id) {
+        return res.json({ success: false, message: "Unauthorized to delete this blog" });
+    }
+
     await Blog.findByIdAndDelete(id);
     await Comment.deleteMany({ blog: id });
     res.json({ success: true, message: "Blog deleted successfully" });
@@ -78,6 +86,10 @@ export const togglePublish = async (req, res) => {
     const { id } = req.body;
     const blog = await Blog.findById(id);
     if (!blog) return res.json({ succes: false, message: "Blog not found" });
+
+    if (req.user && req.user.role === 'user' && blog.author?.toString() !== req.user.id) {
+        return res.json({ success: false, message: "Unauthorized to modify this blog" });
+    }
 
     blog.isPublished = !blog.isPublished;
     await blog.save();

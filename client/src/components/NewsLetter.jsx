@@ -2,13 +2,32 @@ import React from 'react'
 
 const NewsLetter = () => {
   return (
-    <div className='flex flex-col items-center justify-center text-center space-y-2 my-32'>
-        <h1 className='md:text-4xl text-2xl font-semibold'>Never Miss a Blog!</h1>
-        <p className='md:text-lg text-gray-500/70 pb-8'>Subscribe to get latest blog,new tech, and exclusice news.</p>
-        <form className='flex items-center justify-between max-w-2xl w-full md:h-13 h-12'>
-            <input className='border border-gray-300 rounded-md h-full border-r-0 outline-none w-full rounded-r-none px-3 text-gray-500' type="text" placeholder='Enter your email id' required />
-            <button type='submit' className='md:px-12 px-8 h-full text-white bg-primary/80 hover:bg-primary transition-all cursor-pointer rounded-md rounded-1-none'>Subscribe</button>
-        </form>
+    <div className='bg-gray-50 border-t border-b border-gray-200'>
+      <div className='max-w-4xl mx-auto flex flex-col items-center justify-center text-center py-24 px-6'>
+          <span className='uppercase tracking-[0.2em] text-xs font-bold text-primary mb-4'>
+            Stay Updated
+          </span>
+          <h1 className='text-4xl md:text-5xl font-light text-gray-900 mb-6' style={{ fontFamily: "'Prata', serif" }}>
+            The latest essays, <br className="hidden md:block"/> delivered directly.
+          </h1>
+          <p className='md:text-lg text-gray-500 font-light mb-10 max-w-lg leading-relaxed'>
+            Subscribe to our weekly dispatch of ideas, narratives, and insights on modern technology and lifestyle.
+          </p>
+          <form className='flex flex-col sm:flex-row items-center w-full max-w-lg border-b border-gray-900'>
+              <input 
+                className='w-full bg-transparent outline-none px-2 py-4 text-gray-900 placeholder-gray-400 font-light' 
+                type="email" 
+                placeholder='Enter your email address' 
+                required 
+              />
+              <button 
+                type='submit' 
+                className='w-full sm:w-auto mt-4 sm:mt-0 text-gray-900 uppercase tracking-widest text-xs font-bold hover:text-primary transition-colors px-4 py-4 cursor-pointer'
+              >
+                Subscribe
+              </button>
+          </form>
+      </div>
     </div>
   )
 }

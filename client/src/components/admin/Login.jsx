@@ -2,50 +2,122 @@ import React, { useState } from 'react'
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 
-
 const Login = () => {
-
+    const {axios, setToken} = useAppContext();
+    const [mode, setMode] = useState('User Login'); // 'User Login', 'User Register', 'Admin Login'
     
-    const {axios ,setToken} =useAppContext();
-    const [email,setEmail]=useState('');
-    const [password,setPassword]=useState('');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    const handleSubmit =async(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const {data} =await axios.post('/api/admin/login',{email,password})
+            let endpoint = '';
+            let payload = { email, password };
+            
+            if (mode === 'Admin Login') {
+                endpoint = '/api/admin/login';
+            } else if (mode === 'User Login') {
+                endpoint = '/api/user/login';
+            } else if (mode === 'User Register') {
+                endpoint = '/api/user/register';
+                payload = { name, email, password };
+            }
+
+            const {data} = await axios.post(endpoint, payload);
 
             if(data.success){
                 setToken(data.token)
-                localStorage.setItem('token',data.token)
-                axios.defaults.headers.common['Authorization'] =data.token;
-            }
-            else{
-                toast.error(data.message);
+                localStorage.setItem('token', data.token)
+                
+                const role = mode === 'Admin Login' ? 'admin' : 'user';
+                localStorage.setItem('role', role);
+
+                if (data.user && data.user.name) {
+                   localStorage.setItem('userName', data.user.name);
+                }
+                axios.defaults.headers.common['Authorization'] = data.token;
+                toast.success('Successfully authenticated!');
+                
+                // Redirect based on role
+                window.location.href = role === 'admin' ? '/admin' : '/user-dashboard';
+            } else {
+                toast.error(data.message || 'Authentication failed.');
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message || 'API endpoint not found. Please implement backend.');
         }
-       
     }
+    
   return (
-    <div className='flex items-center justify-center h-screen'>
-        <div className='w-full max-w-sm p-6 max-md:m-6 border border-primary/30 shadow-xl shadow-primary/15 rounded-lg'>
-            <div className='flex flex-col items-center justify-center'>
-                 <div className='w-full py-6 text-center'>
-                    <h1 className='text-2xl font-bold'><span className='text-primary'>Admin </span>Login</h1>
-                    <p className='font-light'>Enter your credentials to access the admin panel</p>
+    <div className='flex flex-col items-center justify-center min-h-screen bg-gray-50'>
+        <div className='w-full max-w-md p-10 bg-white border border-gray-200'>
+            <div className='flex flex-col items-center justify-center text-center'>
+                 <div className='w-full mb-10'>
+                    <span className='text-3xl font-bold tracking-tighter text-gray-900 inline-block mb-4' style={{ fontFamily: "'Prata', serif" }}>
+                        OAK<span className='text-primary'>&</span>IRON
+                    </span>
+                    <h1 className='text-xs uppercase tracking-widest font-semibold text-gray-400 mb-2'>Portal Access</h1>
                  </div>
-                 <form onSubmit={handleSubmit} className='mt-6 w-full sm:max-w-md text-gray-600'>
-                    <div className='flex flex-col'>
-                        <label>Email</label>
-                        <input onChange={e=>setEmail(e.target.value)} value={email} type="email" required placeholder='Your email id' className='border-b-2 border-gray-300 p-2 outline-none mb-6'/>
+                 
+                 <div className='flex gap-4 mb-10 w-full justify-center border-b border-gray-200 pb-2'>
+                    {['User Login', 'User Register', 'Admin Login'].map(tab => (
+                        <button 
+                            key={tab}
+                            onClick={() => setMode(tab)}
+                            className={`uppercase tracking-widest text-[9px] font-bold pb-2 border-b-2 transition-colors duration-300 ${mode === tab ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-900'}`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                 </div>
+                 
+                 <form onSubmit={handleSubmit} className='w-full text-left'>
+                    {mode === 'User Register' && (
+                        <div className='flex flex-col mb-8'>
+                            <label className='uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-2'>Full Name</label>
+                            <input 
+                                onChange={e => setName(e.target.value)} 
+                                value={name} 
+                                type="text" 
+                                required 
+                                placeholder='John Doe' 
+                                className='border-b border-gray-300 py-2 outline-none text-gray-900 font-light focus:border-gray-900 transition-colors placeholder-gray-300'
+                            />
+                        </div>
+                    )}
+                    
+                    <div className='flex flex-col mb-8'>
+                        <label className='uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-2'>Email Address</label>
+                        <input 
+                            onChange={e => setEmail(e.target.value)} 
+                            value={email} 
+                            type="email" 
+                            required 
+                            placeholder='name@example.com' 
+                            className='border-b border-gray-300 py-2 outline-none text-gray-900 font-light focus:border-gray-900 transition-colors placeholder-gray-300'
+                        />
                     </div>
-                    <div className='flex flex-col'>
-                        <label>Password</label>
-                        <input onChange={e=>setPassword(e.target.value)} value={password}  type="password" required placeholder='Your password' className='border-b-2 border-gray-300 p-2 outline-none mb-6'/>
+                    
+                    <div className='flex flex-col mb-10'>
+                        <label className='uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-2'>Password</label>
+                        <input 
+                            onChange={e => setPassword(e.target.value)} 
+                            value={password} 
+                            type="password" 
+                            required 
+                            placeholder='••••••••' 
+                            className='border-b border-gray-300 py-2 outline-none text-gray-900 font-light focus:border-gray-900 transition-colors placeholder-gray-300'
+                        />
                     </div>
-                    <button type='submit' className='w-full py-3 font-medium bg-primary text-white rounded cursor-pointer hover:bg-primary/90 transition-all'>Login</button>
+                    
+                    <button 
+                        type='submit' 
+                        className='w-full py-4 uppercase tracking-widest text-xs font-bold bg-gray-900 text-white cursor-pointer hover:bg-primary transition-colors duration-300'
+                    >
+                        {mode === 'User Register' ? 'Create Account' : 'Sign In'}
+                    </button>
                  </form>
             </div>
         </div>

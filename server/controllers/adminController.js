@@ -88,3 +88,14 @@ export const approveCommentById = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+import userModel from '../models/userModel.js';
+
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await userModel.find({}).select('-password').sort({ createdAt: -1 });
+        res.json({ success: true, users });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

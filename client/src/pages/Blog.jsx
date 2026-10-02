@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {useParams} from 'react-router-dom'
-import { assets, blog_data, comments_data } from '../assets/assets';
+import { assets } from '../assets/assets';
 import Navbar from '../components/Navbar';
 import Moment from 'moment'
 import Footer from '../components/Footer';
@@ -9,32 +9,30 @@ import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 const Blog = () => {
+  const {id} = useParams();
+  const {axios} = useAppContext();
 
-  const {id} =useParams();
-  const {axios}=useAppContext();
+  const [data, setData] = useState(null);
+  const [comments, setComments] = useState([]);
 
-  const [data,setData]=useState(null);
-  const [comments,setComments] =useState([]);
+  const [name, setName] = useState('')
+  const [content, setContent] = useState('')
 
-  const [name,setName]=useState('')
-  const [content,setContent] =useState('')
-
-  const fetchBlogData =async ()=>{
+  const fetchBlogData = async () => {
     try {
-      const {data}=await axios.get(`/api/blog/${id}`)
-      data.success?setData(data.blog):toast.error(data.message);
+      const {data} = await axios.get(`/api/blog/${id}`)
+      data.success ? setData(data.blog) : toast.error(data.message);
     } catch (error) {
       toast.error(error.message)
     }
   }
 
-  const fetchComments =async ()=>{
+  const fetchComments = async () => {
     try {
-      const {data}=await axios.post('/api/blog/comments',{blogId:id})
+      const {data} = await axios.post('/api/blog/comments', {blogId: id})
       if(data.success){
         setComments(data.comments);
-      }
-      else{
+      } else {
         toast.error(data.message);
       }
     } catch (error) {
@@ -42,16 +40,15 @@ const Blog = () => {
     }
   }
 
-  const addComment =async (e)=>{
+  const addComment = async (e) => {
     e.preventDefault();
     try {
-      const {data}=await axios.post('/api/blog/add-comment',{blog:id,name,content});
+      const {data} = await axios.post('/api/blog/add-comment', {blog: id, name, content});
       if(data.success){
         toast.success(data.message);
         setName('')
         setContent('')
-      }
-      else{
+      } else {
         toast.error(data.message)
       }
     } catch (error) {
@@ -59,69 +56,102 @@ const Blog = () => {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
       fetchBlogData();
       fetchComments();
-  },[])
+  }, [])
 
   return data ? (
-    <div className='relative'>
-      <img src={assets.gradientBackground} className='absolute -top-50 -z-1 opacity-50' alt="" />
-      <Navbar></Navbar>
+    <div className='relative bg-white'>
+      <Navbar />
 
-      <div className='text-center mt-20 text-gray-600'>
-         <p className='text-primary py-4 font-medium'>Published on {Moment(data.createdAt).format('MMMM Do YYYY')}</p>
-         <h1 className='text-2xl sm:text-5xl font-semibold max-w-2xl mx-auto text-gray-800'>{data.title}</h1>
-         <h2 className='my-5 max-w-lg truncate mx-auto'>{data.subTitle}</h2>
-         <p className='inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 bg-primary/5 font-medium text-primary'>Michael Brown</p>
+      <div className='text-center mt-24 mb-16 px-6'>
+         <p className='uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-6'>
+            Published on {Moment(data.createdAt).format('MMMM Do YYYY')}
+         </p>
+         <h1 className='text-4xl md:text-6xl text-gray-900 max-w-4xl mx-auto leading-tight mb-8' style={{ fontFamily: "'Prata', serif" }}>
+            {data.title}
+         </h1>
+         <h2 className='text-xl md:text-2xl font-light text-gray-500 max-w-3xl mx-auto mb-10'>
+            {data.subTitle}
+         </h2>
+         <div className='flex items-center justify-center gap-4'>
+            <div className='w-10 h-1 bg-primary'></div>
+            <p className='uppercase tracking-widest text-xs font-bold text-gray-900'>Michael Brown</p>
+         </div>
       </div>
 
-      <div className='mx-5 max-w-5xl md:mx-auto my-10 mt-6'>
-          <img src={data.image} className='rounded-3xl mb-5' alt="" />
-          <div className='rich-text max-w-3xl mx-auto' dangerouslySetInnerHTML={{__html:data.description}}></div>
+      <div className='max-w-5xl mx-auto px-6 mb-24'>
+          <div className='w-full overflow-hidden mb-16 bg-gray-100'>
+              <img src={data.image} className='w-full aspect-video object-cover filter grayscale-[10%]' alt={data.title} />
+          </div>
+          
+          <div className='rich-text max-w-3xl mx-auto text-lg leading-loose text-gray-800' style={{ fontFamily: "'Prata', serif" }} dangerouslySetInnerHTML={{__html: data.description}}></div>
 
-          {/* {Comment section}  */}
-          <div className="mt-14 mb-10 max-w-3xl mx-auto">
-            <p className='font-semibold mb-4'>Comments ({comments.length})</p>
-            <div className='flex flex-col gap-4'>
-              {comments.map((item,index)=>(
-                <div key={index} className='relative bg-primary/2 border border-primary/5 max-w-xl p-4 rounded text-gray-600'>
-                  <div className='flex items-center gap-2 mb-2'>
-                    <img src={assets.user_icon} className='w-6' alt="" />
-                    <p className='font-medium'>{item.name}</p>
+          <div className='max-w-3xl mx-auto mt-24 pt-12 border-t border-gray-200'>
+            <h3 className='text-2xl text-gray-900 mb-10' style={{ fontFamily: "'Prata', serif" }}>Discussions ({comments.length})</h3>
+            
+            <div className='flex flex-col gap-8 mb-16'>
+              {comments.map((item, index) => (
+                <div key={index} className='bg-gray-50 p-6 border border-gray-200 text-gray-800 relative'>
+                  <div className='flex justify-between items-start mb-4 border-b border-gray-200 pb-4'>
+                    <p className='uppercase tracking-widest text-xs font-bold text-gray-900'>{item.name}</p>
+                    <span className='text-[10px] text-gray-400 uppercase tracking-widest'>{Moment(item.createdAt).fromNow()}</span>
                   </div>
-                  <p className='text-sm max-w-md ml-8'>{item.content}</p>
-                  <div className='absolute right-4 bottom-3 flex items-center gap-2 text-xs'>{Moment(item.createdAt).fromNow()}</div>
+                  <p className='text-sm leading-relaxed font-light italic'>"{item.content}"</p>
                 </div>
               ))}
             </div>
+            
+            <div className='bg-white border border-gray-200 p-8'>
+                <h4 className='uppercase tracking-widest text-xs font-bold text-gray-900 mb-8'>Leave a Reply</h4>
+                
+                {localStorage.getItem('token') ? (
+                  <form onSubmit={addComment} className='flex flex-col gap-6'>
+                    <div>
+                      <input 
+                          onChange={(e) => setName(e.target.value)} 
+                          value={name} 
+                          type="text" 
+                          placeholder='Your Name' 
+                          required  
+                          className='w-full pb-3 border-b border-gray-300 outline-none focus:border-gray-900 transition-colors placeholder-gray-400 font-light text-gray-900'
+                      />
+                    </div>
+                    <div>
+                      <textarea 
+                          onChange={(e) => setContent(e.target.value)} 
+                          value={content} 
+                          placeholder='Join the discussion...' 
+                          className='w-full p-4 border border-gray-300 outline-none focus:border-gray-900 transition-colors h-32 placeholder-gray-400 font-light text-gray-900' 
+                          required
+                      ></textarea>
+                    </div>
+                    <button type='submit' className='uppercase tracking-widest text-xs font-bold bg-gray-900 text-white py-4 px-8 hover:bg-primary transition-colors duration-300 w-full sm:w-auto self-start cursor-pointer'>
+                        Submit Reply
+                    </button>
+                  </form>
+                ) : (
+                  <div className='text-center py-8 bg-gray-50 border border-gray-100'>
+                     <p className='text-gray-500 font-light mb-4'>You must be a registered member to join the discussion.</p>
+                     <button onClick={() => window.location.href='/admin'} className='uppercase tracking-widest text-xs font-bold text-gray-900 border-b border-gray-900 pb-1 hover:text-primary hover:border-primary transition-colors'>Sign in or Register here</button>
+                  </div>
+                )}
+            </div>
           </div>
-          
-          <div className='max-w-3xl mx-auto'>
-            {/* add comment section  */}
-              <p className='font-semibold mb-4'>Add your comment</p>
-              <form onSubmit={addComment} className='flex flex-col items-start gap-4 max-w-lg'>
-                <input onChange={(e)=>setName(e.target.value)} value={name} type="text" placeholder='Name' required  className='w-full p-2 border border-gray-300 rounded outline-none'/>
 
-                <textarea onChange={(e)=>setContent(e.target.value)} value={content} placeholder='Comment' className='w-full p-2 border border-gray-300 rounded outline-none h-48' required></textarea>
-
-                <button type='submit' className='bg-primary text-white rounded p-2 px-8 hover:scale-102 transition-all cursor-pointer'>Submit</button>
-              </form>
-          </div>
-
-          <div className='my-24 max-w-3xl mx-auto'>
-            {/* Share buttons  */}
-            <p className='font-semibold my-4'>Share this article on social media</p>
-            <div className='flex'>
-              <img src={assets.facebook_icon} width={50} alt="" />
-              <img src={assets.twitter_icon} width={50} alt="" />
-              <img src={assets.googleplus_icon} width={50} alt="" />
+          <div className='max-w-3xl mx-auto my-24 border-t border-gray-200 pt-12 flex flex-col items-center'>
+            <p className='uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-6'>Share this essay</p>
+            <div className='flex gap-4'>
+              <img src={assets.facebook_icon} className="w-10 hover:opacity-70 transition-opacity cursor-pointer" alt="Facebook" />
+              <img src={assets.twitter_icon} className="w-10 hover:opacity-70 transition-opacity cursor-pointer" alt="Twitter" />
+              <img src={assets.googleplus_icon} className="w-10 hover:opacity-70 transition-opacity cursor-pointer" alt="Google" />
             </div>
           </div>
       </div>
-      <Footer></Footer>
+      <Footer />
     </div>
-  ): <Loader></Loader>
+  ) : <Loader />
 }
 
 export default Blog

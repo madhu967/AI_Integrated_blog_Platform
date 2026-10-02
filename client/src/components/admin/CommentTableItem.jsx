@@ -3,21 +3,20 @@ import { assets } from '../../assets/assets';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 
-const CommentTableItem = ({comment,fetchComments}) => {
+const CommentTableItem = ({comment, fetchComments}) => {
+    const {blog, createdAt, _id} = comment;
+    const BlogDate = new Date(createdAt);
+    const {axios} = useAppContext()
 
-    const {blog,createdAt ,_id} =comment;
-    const BlogDate=new Date(createdAt);
-
-    const {axios}=useAppContext()
-
-    const approveComment =async()=>{
+    const approveComment = async () => {
       try {
-        const {data} =await axios.post('/api/admin/approve-comment',{id:_id})
+        const role = localStorage.getItem('role') || 'admin';
+        const endpoint = role === 'user' ? '/api/user/approve-comment' : '/api/admin/approve-comment';
+        const {data} = await axios.post(endpoint, {id:_id})
         if(data.success){
           toast.success(data.message)
           fetchComments()
-        }
-        else{
+        } else {
           toast.error(data.message)
         }
       } catch (error) {
@@ -25,17 +24,18 @@ const CommentTableItem = ({comment,fetchComments}) => {
       }
     }
 
-    const deleteComment =async()=>{
+    const deleteComment = async () => {
       try {
-        const confirm =window.confirm('Are you sure you want to delete this comment?');
+        const confirm = window.confirm('Are you sure you want to delete this comment?');
         if(!confirm) return;
 
-        const {data} =await axios.post('/api/admin/delete-comment',{id:_id})
+        const role = localStorage.getItem('role') || 'admin';
+        const endpoint = role === 'user' ? '/api/user/delete-comment' : '/api/admin/delete-comment';
+        const {data} = await axios.post(endpoint, {id:_id})
         if(data.success){
           toast.success(data.message)
           fetchComments()
-        }
-        else{
+        } else {
           toast.error(data.message)
         }
       } catch (error) {
@@ -44,25 +44,37 @@ const CommentTableItem = ({comment,fetchComments}) => {
     }
 
   return (
-    <tr className='order-y border-gray-300'>
-      <td className='px-6 py-4'>
-        <b className='font-medium text-gray-600'>Blog</b> : {blog.title}
-        <br />
-        <br />
-        <b className='font-medium text-gray-600'>Name</b> : {comment.name}
-        <br />
-        <b className='font-medium text-gray-600'>Comment</b> : {comment.content}
+    <tr className='border-b border-gray-100 hover:bg-gray-50 transition-colors'>
+      <td className='px-6 py-5'>
+        <p className='text-gray-900 font-medium mb-1' style={{ fontFamily: "'Prata', serif" }}>{blog.title}</p>
+        <div className='bg-white border border-gray-200 p-4 mt-3'>
+            <p className='uppercase tracking-widest text-[10px] font-bold text-gray-400 mb-2'>
+                By {comment.name}
+            </p>
+            <p className='text-sm text-gray-700 font-light leading-relaxed italic'>
+                "{comment.content}"
+            </p>
+        </div>
       </td>
-      <td className='px-6 py-4 max-sm:hidden'>
+      <td className='px-6 py-5 max-sm:hidden text-gray-500 text-sm align-top pt-8'>
         {BlogDate.toLocaleDateString()}
       </td>
-      <td className='px-6 py-4'>
-        <div className='inline-flex items-center gap-4'>
-            {!comment.isApproved ? 
-            <img onClick={approveComment}  src={assets.tick_icon} className='w-5 hover:scale-110 transition-all cursor-pointer'></img>
-            :
-            <p className='text-xs border border-green-600 bg-green-110 text-green-600 rounded-full px-3 py-1'>Approved</p>}
-            <img onClick={deleteComment} src={assets.bin_icon} className='w-5 hover:scale-110 transition-all cursor-pointer' alt="" />
+      <td className='px-6 py-5 align-top pt-8'>
+        <div className='flex items-center justify-end gap-4'>
+            {!comment.isApproved ? (
+               <button onClick={approveComment} className='uppercase tracking-widest text-[10px] font-bold px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 transition-colors cursor-pointer border border-green-200'>
+                   Approve
+               </button>
+            ) : (
+              <span className='uppercase tracking-widest text-[10px] font-bold text-gray-400'>
+                  Approved
+              </span>
+            )}
+            <button onClick={deleteComment} className='text-gray-400 hover:text-primary transition-colors cursor-pointer' title="Delete">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
         </div>
       </td>
     </tr>
