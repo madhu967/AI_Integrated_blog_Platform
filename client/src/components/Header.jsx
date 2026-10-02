@@ -24,19 +24,18 @@ const Header = () => {
           {/* Left Column - Content */}
           <div className="flex flex-col justify-center">
             <div className="mb-6 inline-flex">
-              <span className="uppercase tracking-widest text-xs font-bold text-primary border-b-2 border-primary pb-1">
-                A New Standard in Writing
+              <span className="uppercase tracking-widest text-[10px] font-bold text-primary border-b-2 border-primary pb-1">
+                The Premier AI-Enhanced Editorial
               </span>
             </div>
             
-            <h1 className="text-5xl sm:text-7xl font-light text-gray-900 leading-tight mb-8" style={{ fontFamily: "'Prata', serif" }}>
-              Elevate your <br />
-              <span className="font-bold text-primary italic">narrative.</span>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light text-gray-900 leading-tight mb-8" style={{ fontFamily: "'Prata', serif" }}>
+              Write boldly. <br />
+              Publish <span className="font-bold text-primary italic">brilliantly.</span>
             </h1>
             
             <p className="text-lg text-gray-500 max-w-lg mb-10 leading-relaxed font-light">
-              Experience a sophisticated space where your ideas take center stage. 
-              Write, curate, and share profound stories with absolute elegance.
+              Oak & Iron is a sanctuary for modern storytellers. Leverage our cutting-edge AI assistant to seamlessly draft, refine, and perfect your essays before sharing them with the world.
             </p>
             
             <form onSubmit={onSubmitHandler} className="flex flex-col sm:flex-row gap-4 max-w-md">
